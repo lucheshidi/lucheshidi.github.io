@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Boost Wrapper Download</title>
+</head>
+<body>
+  <script>
+    // 创建一个隐藏的 <a> 元素并自动点击
+    const a = document.createElement('a');
+    a.href = '/boost.zip'; // 文件路径
+    a.download = 'boost.zip'; // 下载时的文件名
+    document.body.appendChild(a); // 添加到 DOM 中
+    a.click(); // 模拟点击
+    document.body.removeChild(a); // 下载后移除元素
+  </script>
+</body>
+</html>
+
