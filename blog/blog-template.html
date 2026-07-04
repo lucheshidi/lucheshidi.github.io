@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" data-color-mode="dark" data-dark-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Title</title>
+
+    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.8.1/github-markdown-dark.min.css">
+
+    <script src="/js/loadnav.js"></script>
+    <script src="/js/loadfoot.js"></script>
+    <script src="/js/gridbg.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/lib/marked.umd.js"></script>
+    <script src="https://github.com/cure53/DOMPurify/releases/download/3.4.11/purify.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">
+    <link rel="shortcut icon" href="/assets/favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <script>loadNav("blog")</script>
+    <script>loadFoot()</script>
+
+    <div class="blog-container">
+        <aside class="blog-sidebar">
+            <div class="sidebar-content">
+                <h3>Blog Posts</h3>
+                <div id="blog-tree"></div>
+            </div>
+        </aside>
+        <main class="blog-main">
+            <article class="blog-content markdown-body google-sans-regular"></article>
+            <script>
+                fetch('/blog/md/blog-title.md')
+                    .then(response => response.text())
+                    .then(markdown => {
+                        document.getElementsByClassName('blog-content')[0].innerHTML = DOMPurify.sanitize(marked.parse(markdown));
+                    });
+            </script>
+        </main>
+    </div>
+    <script>
+        // Blog posts data
+        const blogPosts = [
+            { title: 'Blog Title', path: '/blog/blog-title.html' }
+        ];
+
+        // Generate blog tree
+        function generateBlogTree() {
+            const treeContainer = document.getElementById('blog-tree');
+            const ul = document.createElement('ul');
+
+            blogPosts.forEach(post => {
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                a.href = post.path;
+                a.textContent = post.title;
+                li.appendChild(a);
+                ul.appendChild(li);
+            });
+
+            treeContainer.appendChild(ul);
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', generateBlogTree);
+    </script>
+</body>
+</html>
