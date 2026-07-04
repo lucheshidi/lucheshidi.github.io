@@ -41,7 +41,6 @@ function loadNav(activePage) {
   // 创建汉堡菜单按钮（仅在小屏幕显示）
   var hamburger = document.createElement('button');
   hamburger.id = 'nav-hamburger';
-  hamburger.style.display = 'none';
   hamburger.style.position = 'absolute';
   hamburger.style.right = '1rem';
   hamburger.style.top = '50%';
@@ -51,8 +50,10 @@ function loadNav(activePage) {
   hamburger.style.cursor = 'pointer';
   hamburger.style.padding = '0.5rem';
   hamburger.style.zIndex = '10001';
-  hamburger.innerHTML = '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>';
   hamburger.style.color = '#e5e7eb';
+  hamburger.setAttribute('aria-label', 'Toggle navigation menu');
+  hamburger.setAttribute('aria-expanded', 'false');
+  hamburger.innerHTML = '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>';
   nav.appendChild(hamburger);
 
   // 创建链接容器
@@ -75,20 +76,20 @@ function loadNav(activePage) {
   sideMenu.style.bottom = '0';
   sideMenu.style.background = 'rgba(0, 0, 0, 0.6)';
   sideMenu.style.display = 'none';
-  sideMenu.style.zIndex = '9998';
+  sideMenu.style.zIndex = '999';
   sideMenu.style.opacity = '0';
   sideMenu.style.transition = 'opacity 0.3s ease';
 
   var sideMenuContent = document.createElement('div');
   sideMenuContent.id = 'nav-side-content';
   sideMenuContent.style.position = 'fixed';
-  sideMenuContent.style.top = '0';
+  sideMenuContent.style.top = 'var(--nav-height, 0)';
   sideMenuContent.style.left = '-100%';
   sideMenuContent.style.width = '80%';
   sideMenuContent.style.maxWidth = '280px';
-  sideMenuContent.style.height = '100%';
+  sideMenuContent.style.height = 'calc(100% - var(--nav-height, 0))';
   sideMenuContent.style.background = 'rgba(11, 17, 26, 0.98)';
-  sideMenuContent.style.zIndex = '10000';
+  sideMenuContent.style.zIndex = '1000';
   sideMenuContent.style.overflowY = 'auto';
   sideMenuContent.style.transition = 'left 0.3s ease';
   sideMenuContent.style.display = 'none';
@@ -300,17 +301,41 @@ function loadNav(activePage) {
 
   // 汉堡菜单点击事件
   var menuOpen = false;
+  var sideMenuCloseTimer = null;
 
   function openSideMenu() {
+    if (sideMenuCloseTimer) {
+      clearTimeout(sideMenuCloseTimer);
+      sideMenuCloseTimer = null;
+    }
+
     menuOpen = true;
+    sideMenu.style.display = 'block';
+    sideMenu.style.opacity = '1';
+    sideMenuContent.style.display = 'block';
+    sideMenuContent.style.left = '0';
     sideMenu.classList.add('active');
+    hamburger.setAttribute('aria-expanded', 'true');
     document.body.style.overflow = 'hidden';
   }
 
   function closeSideMenu() {
     menuOpen = false;
     sideMenu.classList.remove('active');
+    sideMenuContent.style.left = '-100%';
+    sideMenu.style.opacity = '0';
+    hamburger.setAttribute('aria-expanded', 'false');
     document.body.style.overflow = 'auto';
+
+    if (sideMenuCloseTimer) {
+      clearTimeout(sideMenuCloseTimer);
+    }
+    sideMenuCloseTimer = setTimeout(function() {
+      if (!menuOpen) {
+        sideMenu.style.display = 'none';
+        sideMenuContent.style.display = 'none';
+      }
+    }, 300);
   }
 
   hamburger.addEventListener('click', function() {
@@ -335,11 +360,27 @@ function loadNav(activePage) {
     });
   });
 
-  // 保持 body 的顶部内边距，以避免内容跳动
-  function updateBodyPadding() {
-    document.body.style.paddingTop = nav.offsetHeight + 'px';
+  // 根据屏幕尺寸切换桌面/移动端导航
+  function updateNavLayout() {
+    var isMobile = window.innerWidth <= 768;
+    hamburger.style.display = isMobile ? 'block' : 'none';
+    navdiv.style.display = isMobile ? 'none' : 'flex';
+    if (!isMobile) {
+      closeSideMenu();
+    }
   }
 
+  // 保持 body 的顶部内边距，以避免内容跳动
+  function updateBodyPadding() {
+    var navHeight = nav.offsetHeight + 'px';
+    document.body.style.paddingTop = navHeight;
+    document.documentElement.style.setProperty('--nav-height', navHeight);
+  }
+
+  updateNavLayout();
   updateBodyPadding();
-  window.addEventListener('resize', updateBodyPadding);
+  window.addEventListener('resize', function() {
+    updateNavLayout();
+    updateBodyPadding();
+  });
 }
