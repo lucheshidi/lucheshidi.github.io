@@ -164,8 +164,10 @@ function loadNav(activePage) {
   document.body.insertBefore(nav, document.body.firstChild);
 
   // 保持 body 的顶部内边距，以避免内容跳动
-  var bodyStyle = document.body.style;
-  if (!bodyStyle.paddingTop || bodyStyle.paddingTop === '0px') {
+  function updateBodyPadding() {
     document.body.style.paddingTop = nav.offsetHeight + 'px';
   }
+
+  updateBodyPadding();
+  window.addEventListener('resize', updateBodyPadding);
 }
