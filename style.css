@@ -308,11 +308,11 @@ button {
     cursor: pointer;
     font-size: medium;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 button:hover {
     background-color: #4338ca;
-    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 a {
