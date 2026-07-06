@@ -3,7 +3,7 @@ name: Deploy Static Site
 on:
   push:
     branches:
-      - main  # 如果你的主分支叫 master，请修改为 master
+      - master  # 如果你的主分支叫 master，请修改为 master
 
 permissions:
   contents: read
