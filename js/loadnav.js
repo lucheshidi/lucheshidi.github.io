@@ -1,4 +1,40 @@
+function ensurePageLoader() {
+  if (document.getElementById('page-loader')) {
+    return;
+  }
+
+  var loader = document.createElement('div');
+  loader.id = 'page-loader';
+  loader.innerHTML = '<div class="page-loader-card"><div class="page-loader-spinner"></div><p class="ubuntu-medium">Loading page…</p></div>';
+  var container = document.body || document.documentElement;
+  if (container) {
+    container.appendChild(loader);
+  }
+}
+
+function hidePageLoader() {
+  var loader = document.getElementById('page-loader');
+  if (!loader) {
+    return;
+  }
+
+  loader.classList.add('is-hidden');
+  window.setTimeout(function() {
+    if (loader.parentNode) {
+      loader.parentNode.removeChild(loader);
+    }
+  }, 250);
+}
+
 function loadNav(activePage) {
+  ensurePageLoader();
+  window.addEventListener('load', hidePageLoader, { once: true });
+  if (document.readyState === 'complete') {
+    hidePageLoader();
+  } else {
+    window.addEventListener('DOMContentLoaded', hidePageLoader, { once: true });
+  }
+
   // 定义导航菜单项（英文标签）
   var items = [
     { id: 'home', text: 'Home', href: '/' },

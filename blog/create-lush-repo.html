@@ -6,14 +6,14 @@
     <title>Making Your Own LucheShell Repository</title>
 
     <link rel="stylesheet" href="/style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.8.1/github-markdown-dark.min.css">
+    <link rel="stylesheet" href="/assets/vendor/github-markdown-dark.min.css">
 
     <script src="/js/loadnav.js"></script>
     <script src="/js/loadfoot.js"></script>
     <script src="/js/gridbg.js"></script>
 
-    <script src="https://cdn.jsdelivr.net/npm/marked/lib/marked.umd.js"></script>
-    <script src="https://github.com/cure53/DOMPurify/releases/download/3.4.11/purify.js"></script>
+    <script src="/assets/vendor/marked.umd.js"></script>
+    <script src="/assets/vendor/purify.min.js"></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -32,12 +32,24 @@
             </div>
         </aside>
         <main class="blog-main">
-            <article class="blog-content markdown-body google-sans-regular"></article>
+            <article class="blog-content markdown-body google-sans-regular">
+                <div class="blog-loading">Loading article…</div>
+            </article>
             <script>
+                var blogContent = document.getElementsByClassName('blog-content')[0];
                 fetch('/blog/md/create-lush-repo.md')
-                    .then(response => response.text())
-                    .then(markdown => {
-                        document.getElementsByClassName('blog-content')[0].innerHTML = DOMPurify.sanitize(marked.parse(markdown));
+                    .then(function(response) {
+                        if (!response.ok) {
+                            throw new Error('Failed to load article');
+                        }
+                        return response.text();
+                    })
+                    .then(function(markdown) {
+                        blogContent.innerHTML = DOMPurify.sanitize(marked.parse(markdown));
+                    })
+                    .catch(function(error) {
+                        console.error(error);
+                        blogContent.innerHTML = '<p class="blog-loading">The article could not be loaded right now.</p>';
                     });
             </script>
         </main>
