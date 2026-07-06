@@ -5,7 +5,7 @@ function ensurePageLoader() {
 
   var loader = document.createElement('div');
   loader.id = 'page-loader';
-  loader.innerHTML = '<div class="page-loader-card"><div class="page-loader-spinner"></div><p class="ubuntu-medium">Loading page…</p></div>';
+  loader.innerHTML = '<div class="page-loader-card"><div class="page-loader-spinner"></div><p class="google-sans-regular">Loading page…</p></div>';
   var container = document.body || document.documentElement;
   if (container) {
     container.appendChild(loader);
