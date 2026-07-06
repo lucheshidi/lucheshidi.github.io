@@ -3,35 +3,35 @@ name: Deploy Static Site
 on:
   push:
     branches:
-      - master
+      - main  # 如果你的主分支叫 master，请修改为 master
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      # 2. 核心步骤：获取最新 Commit ID 并替换 footer.html 里的占位符
-      - name: Inject Commit ID into Footer
+      - name: Inject Commit ID
         run: |
-          # 获取当前最新的简短 Commit ID（例如 7a2b3c4）
-          COMMIT_ID=$(git rev-parse --short HEAD)
-          echo "当前的 Commit ID 是: $COMMIT_ID"
-          
-          # 将 footer.html 里的 GIT_COMMIT_HASH_PLACEHOLDER 替换为真正的哈希值
-          # 如果你的 footer.html 在根目录，路径就是 footer.html
-          sed -i "s/GIT_COMMIT_HASH_PLACEHOLDER/$COMMIT_ID/g" footer.html
+          sed -i "s/GIT_COMMIT_HASH_PLACEHOLDER/$(git rev-parse --short HEAD)/g" footer.html
 
-      # 3. 将修改后的静态网页自动发布到 gh-pages 分支
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./  # 网页所在的目录。如果是根目录就写 ./
-          publish_branch: gh-pages  # 自动生成的线上分支名
+          path: '.'
+
+      - name: Deploy
+        uses: actions/deploy-pages@v4
