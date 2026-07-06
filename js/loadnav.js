@@ -41,20 +41,27 @@ function loadNav(activePage) {
   // 创建汉堡菜单按钮（仅在小屏幕显示）
   var hamburger = document.createElement('button');
   hamburger.id = 'nav-hamburger';
-  hamburger.style.position = 'absolute';
+  hamburger.style.position = 'fixed';
   hamburger.style.right = '1rem';
-  hamburger.style.top = '50%';
-  hamburger.style.transform = 'translateY(-50%)';
-  hamburger.style.background = 'none';
-  hamburger.style.border = 'none';
+  hamburger.style.top = '1rem';
+  hamburger.style.width = '44px';
+  hamburger.style.height = '44px';
+  hamburger.style.transform = 'none';
+  hamburger.style.background = 'rgba(255, 255, 255, 0.06)';
+  hamburger.style.border = '1px solid rgba(255, 255, 255, 0.12)';
+  hamburger.style.borderRadius = '8px';
   hamburger.style.cursor = 'pointer';
-  hamburger.style.padding = '0.5rem';
+  hamburger.style.display = 'flex';
+  hamburger.style.alignItems = 'center';
+  hamburger.style.justifyContent = 'center';
+  hamburger.style.padding = '0';
   hamburger.style.zIndex = '10001';
   hamburger.style.color = '#e5e7eb';
   hamburger.setAttribute('aria-label', 'Toggle navigation menu');
   hamburger.setAttribute('aria-expanded', 'false');
   hamburger.innerHTML = '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>';
-  nav.appendChild(hamburger);
+  // Create hamburger in body so fixed positioning is always viewport-relative.
+  hamburger.style.left = 'auto';
 
   // 创建链接容器
   var navdiv = document.createElement('div');
@@ -95,6 +102,9 @@ function loadNav(activePage) {
   sideMenuContent.style.display = 'none';
 
   sideMenu.appendChild(sideMenuContent);
+
+  var sideDropdownOpen = false;
+  var sideDropdown = null;
 
   // 项目下拉内容（示例）
   var projectsDropdownItems = [
@@ -256,7 +266,7 @@ function loadNav(activePage) {
         sideDropdown.appendChild(di);
       });
 
-      var sideDropdownOpen = false;
+      sideDropdownOpen = false;
 
       function setSideDropdownOpen(open) {
         sideDropdownOpen = open;
@@ -269,8 +279,10 @@ function loadNav(activePage) {
         }
       }
 
+      sideLink.dataset.menuToggle = 'true';
       sideLink.addEventListener('click', function(e) {
         e.preventDefault();
+        e.stopPropagation();
         setSideDropdownOpen(!sideDropdownOpen);
       });
 
@@ -295,9 +307,16 @@ function loadNav(activePage) {
     existingSideMenu.parentNode.removeChild(existingSideMenu);
   }
 
+  // 如果已有旧汉堡按钮，则先移除
+  var existingHamburger = document.getElementById('nav-hamburger');
+  if (existingHamburger) {
+    existingHamburger.parentNode.removeChild(existingHamburger);
+  }
+
   // 将导航插入到 body 的最前面
   document.body.insertBefore(nav, document.body.firstChild);
   document.body.insertBefore(sideMenu, document.body.firstChild);
+  document.body.insertBefore(hamburger, document.body.firstChild);
 
   // 汉堡菜单点击事件
   var menuOpen = false;
@@ -326,6 +345,10 @@ function loadNav(activePage) {
     sideMenu.style.opacity = '0';
     hamburger.setAttribute('aria-expanded', 'false');
     document.body.style.overflow = 'auto';
+
+    if (sideDropdown && sideDropdownOpen) {
+      setSideDropdownOpen(false);
+    }
 
     if (sideMenuCloseTimer) {
       clearTimeout(sideMenuCloseTimer);
@@ -356,7 +379,9 @@ function loadNav(activePage) {
   var sideLinks = sideMenuContent.querySelectorAll('.side-nav-link');
   sideLinks.forEach(function(link) {
     link.addEventListener('click', function() {
-      closeSideMenu();
+      if (link.dataset.menuToggle !== 'true') {
+        closeSideMenu();
+      }
     });
   });
 

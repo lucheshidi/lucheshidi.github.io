@@ -274,7 +274,8 @@ placeholder {
 }
 
 .contact-button {
-    width: 30rem;
+    width: min(30rem, 100%);
+    max-width: 100%;
     align-content: center;
 }
 
@@ -457,6 +458,10 @@ placeholder {
         gap: 0.45rem;
     }
 
+    #site-nav {
+        width: 100vw;
+    }
+
     #site-nav img {
         width: 110px;
         height: auto;
@@ -465,7 +470,18 @@ placeholder {
     }
 
     #nav-hamburger {
-        display: block !important;
+        position: fixed !important;
+        inset: 1rem 1rem auto auto !important;
+        width: 44px !important;
+        height: 44px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 0 !important;
+        background: rgba(255, 255, 255, 0.06) !important;
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+        border-radius: 8px !important;
+        color: #e5e7eb !important;
     }
 
     #nav-links-desktop {
