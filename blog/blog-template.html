@@ -7,6 +7,7 @@
 
     <link rel="stylesheet" href="/style.css">
     <link rel="stylesheet" href="/assets/vendor/github-markdown-dark.min.css">
+    <link rel="stylesheet" href="/assets/vendor/a11y-dark.min.css">
 
     <script src="/js/loadnav.js"></script>
     <script src="/js/loadfoot.js"></script>
@@ -14,6 +15,8 @@
 
     <script src="/assets/vendor/marked.umd.js"></script>
     <script src="/assets/vendor/purify.min.js"></script>
+    <script src="/assets/vendor/markedalert.umd.min.js"></script>
+    <script src="/assets/vendor/highlight.min.js"></script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -37,7 +40,7 @@
             </article>
             <script>
                 var blogContent = document.getElementsByClassName('blog-content')[0];
-                fetch('/blog/md/blog-title.md')
+                fetch('/blog/md/blog.md')
                     .then(function(response) {
                         if (!response.ok) {
                             throw new Error('Failed to load article');
@@ -45,19 +48,68 @@
                         return response.text();
                     })
                     .then(function(markdown) {
+                        marked.use(markedAlert());
+
+                        var blogContent = document.querySelector('.blog-content');
                         blogContent.innerHTML = DOMPurify.sanitize(marked.parse(markdown));
+
+                        // 1. RUN THIS DIRECTLY: Colors the raw bash scripts and command flags
+                        hljs.highlightAll();
+
+                        // 2. RUN THIS DIRECTLY: Appends the floating copy controls inside the box corners
+                        addCopyButtons();
                     })
                     .catch(function(error) {
                         console.error(error);
-                        blogContent.innerHTML = '<p class="blog-loading">The article could not be loaded right now.</p>';
+                        var errorContent = document.querySelector('.blog-content');
+                        if (errorContent) {
+                            errorContent.innerHTML = '<p class="blog-loading">The article could not be loaded right now.</p>';
+                        }
                     });
+
+                // The functionality logic for copying text
+                function addCopyButtons() {
+                    // Target all pre elements rendered inside your markdown node container
+                    var codeBlocks = document.querySelectorAll('.markdown-body pre');
+
+                    codeBlocks.forEach(function(pre) {
+                        // Stop if a button is already appended inside this block
+                        if (pre.querySelector('.copy-code-btn')) return;
+
+                        // Force relative position directly onto the pre element style layer
+                        pre.style.position = 'relative';
+
+                        // Set up the button properties
+                        var button = document.createElement('button');
+                        button.className = 'copy-code-btn google-sans-regular';
+                        button.type = 'button';
+                        button.innerText = 'Copy';
+
+                        button.addEventListener('click', function() {
+                            var codeText = pre.querySelector('code').innerText;
+                            navigator.clipboard.writeText(codeText).then(function() {
+                                button.innerText = 'Copied!';
+                                button.classList.add('copied');
+                                setTimeout(function() {
+                                    button.innerText = 'Copy';
+                                    button.classList.remove('copied');
+                                }, 2000);
+                            }).catch(function(err) {
+                                console.error('Could not copy text: ', err);
+                            });
+                        });
+
+                        // Append the button directly inside the code container
+                        pre.appendChild(button);
+                    });
+                }
             </script>
         </main>
     </div>
     <script>
         // Blog posts data
         const blogPosts = [
-            { title: 'Blog Title', path: '/blog/blog-title.html' }
+            { title: 'Making Your Own LucheShell Repository', path: '/blog/create-lush-repo.html' }
         ];
 
         // Generate blog tree

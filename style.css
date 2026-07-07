@@ -610,3 +610,85 @@ placeholder {
 .markdown-body h4 strong {
     font-weight: 700 !important; /* Change to 800 if you want the maximum Google Font weight */
 }
+
+.markdown-body pre {
+    position: relative !important;   /* Critical coordinate anchor for the absolute button */
+    overflow: visible !important;    /* Keeps the button inside visual bounds */
+    
+    /* FIX: Force a structural flex column layout to drop empty spaces */
+    display: flex !important;
+    flex-direction: column !important;
+    
+    padding-top: 1rem !important;    /* Small tight upper cushion spacing */
+    padding-bottom: 1rem !important; /* Balanced lower cushion spacing */
+    padding-left: 1.2rem !important;
+    padding-right: 5rem !important;  /* Buffer zone protecting the button track */
+}
+
+/* 2. Disappear any ghost blank paragraphs or line breaks injected by the parser */
+.markdown-body pre p,
+.markdown-body pre br,
+.markdown-body pre span:empty {
+    display: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: 0 !important;
+}
+
+/* 3. Force the main code element block straight to the top of the flex grid */
+.markdown-body pre code {
+    display: block !important;
+    overflow-x: auto !important;  /* Allows touch/trackpad/mouse dragging */
+    width: 100% !important;
+    
+    /* FIX FOR FIREFOX & IE: Disappears scroll bar structures natively */
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+}
+
+/* FIX FOR CHROME/SAFARI/EDGE: Forces scroll bar tracks to 0 physical size */
+.markdown-body pre code::-webkit-scrollbar {
+    width: 0 !important;
+    height: 0 !important;
+    display: none !important;
+}
+
+/* 4. Overlay the copy button tightly inside the absolute corner boundary */
+.copy-code-btn {
+    position: absolute !important;   /* Strips it completely out of the flex column stream */
+    top: 10px !important;            /* Clean placement 10px from the upper edge boundary */
+    right: 10px !important;          /* Fixed 10px from the right track boundary */
+    
+    display: inline-block !important;
+    width: auto !important;
+    max-width: 70px !important;
+    padding: 4px 10px !important;
+    
+    font-family: 'Ubuntu', sans-serif !important;
+    font-size: 0.72rem !important;
+    font-weight: 500 !important;
+    line-height: 1.2 !important;
+    
+    color: #cbd5e1 !important;
+    background-color: #1e293b !important;
+    border: 1px solid #334155 !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+    user-select: none !important;
+    z-index: 99 !important;          /* Guarantees the button floats cleanly above code */
+    transition: background-color 0.12s ease, border-color 0.12s ease;
+}
+
+/* Hover Accent States */
+.copy-code-btn:hover {
+    background-color: #334155 !important;
+    border-color: #475569 !important;
+    color: #ffffff !important;
+}
+
+/* Copied Context Success State Layout */
+.copy-code-btn.copied {
+    color: #4ade80 !important;        
+    border-color: #22c55e !important;
+    background-color: #0f172a !important;
+}
